@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,14 +14,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CashCraft"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7396672595950501~6954752169"/>
+
+        <activity android:name=".ui.main.AddTransactionActivity"
+            android:exported="true"/>
+
+        <activity android:name=".ui.main.TransactionListActivity"
+            android:exported="true"/>
+
+        <activity android:name=".ui.main.TransactionDetailActivity"
+            android:exported="true"/>
+
+        <activity android:name=".ui.main.EditTransactionActivity"
+            android:exported="true"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.CashCraft">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

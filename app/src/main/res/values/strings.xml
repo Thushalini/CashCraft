@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">CashCraft</string>
+
+    <!--main-->
+    <string name="welcome">Welcome to Finance Tracker</string>
+    <string name="balance1">Current Balance</string>
+    <string name="balance2">$0.00</string>
+    <string name="add_ex">➖ Add Expense</string>
+    <string name="add_in">➕ Add Income</string>
+    <string name="view_tr">📄 View Transactions</string>
+    <string name="recent_tr">Recent Transactions</string>
+    <string name="category1">Groceries</string>
+    <string name="price1">-$40.00</string>
+    <string name="overview">Expense vs Income Overview</string>
+    <string name="chart">Overview chart</string>
+
+    <!--Add Transaction-->
+    <string name="add_tr">Add Transaction</string>
+    <string name="amount">Amount</string>
+    <string name="desc">Description</string>
+    <string name="date">Date :</string>
+    <string name="save">Save Transaction</string>
+    <string name="exp">Expense</string>
+    <string name="inc">Income</string>
 </resources>

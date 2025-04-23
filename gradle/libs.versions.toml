@@ -1,14 +1,16 @@
 [versions]
-agp = "8.7.2"
+agp = "8.7.3"
 kotlin = "2.0.0"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
-composeBom = "2024.04.01"
+composeBom = "2025.04.00"
 appcompat = "1.7.0"
+constraintlayout = "2.2.1"
+#firebaseCrashlyticsBuildtools = "3.0.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,6 +29,10 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 cardview = { group = "androidx.cardview", name = "cardview", version = "1.0.0" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.4.0" }
+#firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+gson = { group = "com.google.code.gson", name = "gson", version = "2.10.1" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -22,4 +22,13 @@
     <string name="save">Save Transaction</string>
     <string name="exp">Expense</string>
     <string name="inc">Income</string>
+    <string name="transaction_title">Transaction Title</string>
+    <string name="_0_00">₹0.00</string>
+    <string name="category">Category:</string>
+    <string name="date1">Date:</string>
+    <string name="notes">Notes:</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+
+    <!--single Transaction-->
 </resources>

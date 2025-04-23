@@ -9,5 +9,4 @@ data class Transaction(
     var category: String,
     val date: String,
     var notes: String,
-    val type: String // "Income" or "Expense"
 ) : Serializable

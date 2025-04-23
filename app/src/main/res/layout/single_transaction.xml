@@ -14,7 +14,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Transaction Title"
+        android:text="@string/transaction_title"
         android:textStyle="bold"
         android:textSize="16sp" />
 
@@ -22,8 +22,8 @@
         android:id="@+id/tvAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="₹0.00"
-        android:textColor="#4CAF50"
+        android:text="@string/_0_00"
+        android:textColor="@color/green"
         android:textSize="14sp" />
 
     <!-- Detail view (initially hidden) -->
@@ -39,19 +39,19 @@
             android:id="@+id/tvCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Category: " />
+            android:text="@string/category" />
 
         <TextView
             android:id="@+id/tvDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Date: " />
+            android:text="@string/date1" />
 
         <TextView
             android:id="@+id/tvNotes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Notes: " />
+            android:text="@string/notes" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -66,7 +66,7 @@
                 android:layout_height="48dp"
                 android:layout_margin="21dp"
                 android:background="@color/green"
-                android:contentDescription="Edit"
+                android:contentDescription="@string/edit"
                 android:src="@android:drawable/ic_menu_edit" />
 
             <ImageButton
@@ -75,7 +75,7 @@
                 android:layout_height="48dp"
                 android:layout_margin="21dp"
                 android:background="@color/red"
-                android:contentDescription="Delete"
+                android:contentDescription="@string/delete"
                 android:src="@android:drawable/ic_menu_delete" />
         </LinearLayout>
     </LinearLayout>

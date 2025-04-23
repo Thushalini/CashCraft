@@ -1,10 +1,12 @@
 package com.thushalini.cashcraft.ui.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import com.thushalini.cashcraft.R
 import org.json.JSONArray
 
@@ -18,6 +20,22 @@ class TransactionDetailActivity : ComponentActivity() {
     private lateinit var btnEdit: Button
     private lateinit var btnDelete: Button
     private lateinit var transaction: Transaction
+
+    // Registering the ActivityResultLauncher
+    private val editTransactionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val data = result.data
+                if (data != null) {
+                    val updatedTransaction = data.getSerializableExtra("updated_transaction") as? Transaction
+                    if (updatedTransaction != null) {
+                        transaction = updatedTransaction
+                        displayTransactionDetails()
+                        updateTransactionInPrefs(updatedTransaction)
+                    }
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,17 +51,22 @@ class TransactionDetailActivity : ComponentActivity() {
         btnDelete = findViewById(R.id.btnDelete)
 
         // Get transaction data from intent
-        transaction = intent.getSerializableExtra("transaction") as Transaction
+        val passedTransaction = intent.getSerializableExtra("transaction") as? Transaction
+        if (passedTransaction == null) {
+            Toast.makeText(this, "Transaction not found!", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+        transaction = passedTransaction
 
         // Display the transaction details
         displayTransactionDetails()
 
         // Set click listener for Edit button
         btnEdit.setOnClickListener {
-            // Start EditTransactionActivity to edit this transaction
             val intent = Intent(this, EditTransactionActivity::class.java)
             intent.putExtra("transaction", transaction)
-            startActivityForResult(intent, 200)
+            editTransactionLauncher.launch(intent)
         }
 
         // Set click listener for Delete button
@@ -52,6 +75,7 @@ class TransactionDetailActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun displayTransactionDetails() {
         tvTitle.text = transaction.title
         tvAmount.text = "₹%.2f".format(transaction.amount)
@@ -61,8 +85,7 @@ class TransactionDetailActivity : ComponentActivity() {
     }
 
     private fun deleteTransaction(transaction: Transaction) {
-        // Remove transaction from SharedPreferences
-        val sharedPref = getSharedPreferences("transactions", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("transactionList", Context.MODE_PRIVATE)
         val jsonString = sharedPref.getString("transaction_list", "[]")
         val jsonArray = JSONArray(jsonString)
 
@@ -74,34 +97,16 @@ class TransactionDetailActivity : ComponentActivity() {
             }
         }
 
-        // Save the updated list back to SharedPreferences
         sharedPref.edit().putString("transaction_list", jsonArray.toString()).apply()
-
-        // Show a toast and finish the activity
         Toast.makeText(this, "Transaction deleted", Toast.LENGTH_SHORT).show()
         finish()
     }
 
-    // Handle result from EditTransactionActivity (if edited)
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 200 && resultCode == RESULT_OK && data != null) {
-            val updatedTransaction = data.getSerializableExtra("updated_transaction") as Transaction
-            transaction = updatedTransaction
-            displayTransactionDetails()
-
-            // Update the transaction in SharedPreferences
-            updateTransactionInPrefs(updatedTransaction)
-        }
-    }
-
     private fun updateTransactionInPrefs(updatedTransaction: Transaction) {
-        val sharedPref = getSharedPreferences("transactions", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("transactionList", Context.MODE_PRIVATE)
         val jsonString = sharedPref.getString("transaction_list", "[]")
         val jsonArray = JSONArray(jsonString)
 
-        // Find and update the transaction in the list
         for (i in 0 until jsonArray.length()) {
             val obj = jsonArray.getJSONObject(i)
             if (obj.getString("id") == updatedTransaction.id.toString()) {
@@ -114,10 +119,7 @@ class TransactionDetailActivity : ComponentActivity() {
             }
         }
 
-        // Save the updated list back to SharedPreferences
         sharedPref.edit().putString("transaction_list", jsonArray.toString()).apply()
-
-        // Notify user
         Toast.makeText(this, "Transaction updated", Toast.LENGTH_SHORT).show()
     }
 }

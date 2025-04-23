@@ -94,7 +94,6 @@ class AddTransactionActivity : ComponentActivity() {
                 category = category,
                 date = selectedDate,
                 notes = description,
-                type = transactionType
             )
 
             // Save or update the transaction
@@ -104,7 +103,7 @@ class AddTransactionActivity : ComponentActivity() {
 
             val resultIntent = Intent().apply {
                 putExtra("amount", amount)
-                putExtra("type", transactionType)
+                putExtra("title", transactionType)
             }
 
             setResult(RESULT_OK, resultIntent)
@@ -133,7 +132,7 @@ class AddTransactionActivity : ComponentActivity() {
 //        }
 //    }
 
-    fun saveTransaction(context: Context, newTransaction: Transaction) {
+    private fun saveTransaction(context: Context, newTransaction: Transaction) {
         val sharedPref = context.getSharedPreferences("transactionList", Context.MODE_PRIVATE)
         val existing = sharedPref.getString("transaction_list", "[]")
         val jsonArray = JSONArray(existing)

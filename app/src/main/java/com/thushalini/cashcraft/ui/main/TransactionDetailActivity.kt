@@ -3,10 +3,12 @@ package com.thushalini.cashcraft.ui.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import com.thushalini.cashcraft.R
 import org.json.JSONArray
 
@@ -22,12 +24,14 @@ class TransactionDetailActivity : ComponentActivity() {
     private lateinit var transaction: Transaction
 
     // Registering the ActivityResultLauncher
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val editTransactionLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val data = result.data
                 if (data != null) {
-                    val updatedTransaction = data.getSerializableExtra("updated_transaction") as? Transaction
+                    val updatedTransaction = result.data?.getSerializableExtra("updated_transaction", Transaction::class.java)
+//                    val updatedTransaction = data.getSerializableExtra("updated_transaction") as? Transaction
                     if (updatedTransaction != null) {
                         transaction = updatedTransaction
                         displayTransactionDetails()
@@ -37,6 +41,7 @@ class TransactionDetailActivity : ComponentActivity() {
             }
         }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.transaction_detail)
@@ -51,7 +56,8 @@ class TransactionDetailActivity : ComponentActivity() {
         btnDelete = findViewById(R.id.btnDelete)
 
         // Get transaction data from intent
-        val passedTransaction = intent.getSerializableExtra("transaction") as? Transaction
+        val passedTransaction = intent.getSerializableExtra("transaction", Transaction::class.java)
+//        val passedTransaction = intent.getSerializableExtra("transaction") as? Transaction
         if (passedTransaction == null) {
             Toast.makeText(this, "Transaction not found!", Toast.LENGTH_SHORT).show()
             finish()
@@ -64,15 +70,26 @@ class TransactionDetailActivity : ComponentActivity() {
 
         // Set click listener for Edit button
         btnEdit.setOnClickListener {
-            val intent = Intent(this, EditTransactionActivity::class.java)
-            intent.putExtra("transaction", transaction)
+//            val intent = Intent(this, EditTransactionActivity::class.java)
+//            intent.putExtra("transaction", transaction)
+//            editTransactionLauncher.launch(intent)
+
+            val intent = Intent(this, AddTransactionActivity::class.java)
+            intent.putExtra("transaction", transaction) // Pass current transaction to be edited
+            intent.putExtra("isEditMode", true) // A flag to let AddTransactionActivity know it's editing
             editTransactionLauncher.launch(intent)
+
         }
 
         // Set click listener for Delete button
         btnDelete.setOnClickListener {
             deleteTransaction(transaction)
+            Toast.makeText(this, "Transaction deleted", Toast.LENGTH_SHORT).show()
+            finish()
         }
+
+//        findViewById<Button>(R.id.btnCancel).setOnClickListener {
+//            finish() // just go back
     }
 
     @SuppressLint("SetTextI18n")

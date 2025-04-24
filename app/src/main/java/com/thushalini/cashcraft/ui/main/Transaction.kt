@@ -9,4 +9,5 @@ data class Transaction(
     var category: String,
     val date: String,
     var notes: String,
+    var isExpanded: Boolean = false // Add this
 ) : Serializable

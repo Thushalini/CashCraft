@@ -1,7 +1,7 @@
 package com.thushalini.cashcraft
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
+//import android.app.AlertDialog
 //import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -13,19 +13,25 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+//import androidx.core.content.ContextCompat
+//import androidx.recyclerview.widget.LinearLayoutManager
+//import androidx.recyclerview.widget.RecyclerView
 import com.thushalini.cashcraft.ui.main.AddTransactionActivity
-import com.thushalini.cashcraft.ui.main.Transaction
+//import com.thushalini.cashcraft.ui.main.Transaction
 import com.thushalini.cashcraft.ui.main.TransactionListActivity
-import com.google.gson.reflect.TypeToken
-import com.google.gson.Gson
-import com.thushalini.cashcraft.ui.main.EditTransactionActivity
-import com.thushalini.cashcraft.ui.main.TransactionAdapter
+//import com.github.mikephil.charting.charts.PieChart
+//import com.github.mikephil.charting.data.PieData
+//import com.github.mikephil.charting.data.PieDataSet
+//import com.github.mikephil.charting.data.PieEntry
+//import com.google.gson.reflect.TypeToken
+//import com.google.gson.Gson
+//import com.thushalini.cashcraft.ui.main.EditTransactionActivity
+//import com.thushalini.cashcraft.ui.main.TransactionAdapter
 
 
 class MainActivity : ComponentActivity() {
 
+//    private var _binding: FragmentDashboardBinding? = null
     private lateinit var tvBalance: TextView
     private lateinit var btnAddExpense: Button
     private lateinit var btnAddIncome: Button
@@ -35,8 +41,9 @@ class MainActivity : ComponentActivity() {
     private var monthlyBudget: Double = 0.0
 
     private lateinit var addTransactionLauncher: ActivityResultLauncher<Intent>
-    private lateinit var transactionList: MutableList<Transaction>
+//    private lateinit var transactionList: MutableList<Transaction>
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
@@ -45,34 +52,34 @@ class MainActivity : ComponentActivity() {
         btnAddExpense = findViewById(R.id.btnAddExpense)
         btnAddIncome = findViewById(R.id.btnAddIncome)
         btnViewTransactions = findViewById(R.id.btnViewTransactions)
-        val recyclerView: RecyclerView = findViewById(R.id.recyclerViewTransactions)
+//        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewTransactions)
 
 
-        loadTransactions()
-
-        // Declare the adapter first
-        val adapter = TransactionAdapter(this@MainActivity, transactionList, object : TransactionAdapter.OnTransactionActionListener {
-            override fun onEdit(transaction: Transaction) {
-                val intent = Intent(this@MainActivity, EditTransactionActivity::class.java)
-                intent.putExtra("transaction_id", transaction.id)
-                startActivity(intent)
-            }
-
-            override fun onDelete(transaction: Transaction) {
-                AlertDialog.Builder(this@MainActivity)
-                    .setMessage("Are you sure you want to delete this transaction?")
-                    .setPositiveButton("Yes") { _, _ ->
-                        // Remove the transaction and notify the adapter
-                        transactionList.remove(transaction)
-//                        adapter.notifyDataSetChanged() // Now this works since adapter is in scope
-                    }
-                    .setNegativeButton("No", null)
-                    .show()
-            }
-    })
-
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+//        loadTransactions()
+//
+//        // Declare the adapter first
+//        val adapter = TransactionAdapter(this@MainActivity, transactionList, object : TransactionAdapter.OnTransactionActionListener {
+//            override fun onEdit(transaction: Transaction) {
+//                val intent = Intent(this@MainActivity, EditTransactionActivity::class.java)
+//                intent.putExtra("transaction_id", transaction.id)
+//                startActivity(intent)
+//            }
+//
+//            override fun onDelete(transaction: Transaction) {
+//                AlertDialog.Builder(this@MainActivity)
+//                    .setMessage("Are you sure you want to delete this transaction?")
+//                    .setPositiveButton("Yes") { _, _ ->
+//                        // Remove the transaction and notify the adapter
+//                        transactionList.remove(transaction)
+////                        adapter.notifyDataSetChanged() // Now this works since adapter is in scope
+//                    }
+//                    .setNegativeButton("No", null)
+//                    .show()
+//            }
+//    })
+//
+//        recyclerView.layoutManager = LinearLayoutManager(this)
+//        recyclerView.adapter = adapter
 
         // Load saved balance and monthly budget
         val sharedPreferences = getSharedPreferences("CashCraftPrefs", MODE_PRIVATE)
@@ -132,18 +139,76 @@ class MainActivity : ComponentActivity() {
     }
 
     // Load transactions from SharedPreferences
-    private fun loadTransactions() {
-        val sharedPreferences = getSharedPreferences("CashCraftPrefs", MODE_PRIVATE)
-        val transactionsJson = sharedPreferences.getString("transactions", null)
-        if (!transactionsJson.isNullOrEmpty()) {
-            val gson = Gson()
-            val type = object : TypeToken<MutableList<Transaction>>() {}.type
-            transactionList = gson.fromJson(transactionsJson, type)
-        } else {
-            transactionList = mutableListOf()
-        }
-    }
+//    private fun loadTransactions() {
+//        val sharedPreferences = getSharedPreferences("CashCraftPrefs", MODE_PRIVATE)
+//        val transactionsJson = sharedPreferences.getString("transactions", null)
+//        if (!transactionsJson.isNullOrEmpty()) {
+//            val gson = Gson()
+//            val type = object : TypeToken<MutableList<Transaction>>() {}.type
+//            transactionList = gson.fromJson(transactionsJson, type)
+//        } else {
+//            transactionList = mutableListOf()
+//        }
+//    }
 
+//    private fun setupPieChart() {
+//        try {
+//            binding.pieChart.apply {
+//                description.isEnabled = false
+//                legend.isEnabled = true
+//                setHoleColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+//                setTransparentCircleColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+//                setEntryLabelColor(ContextCompat.getColor(requireContext(), android.R.color.black))
+//                setEntryLabelTextSize(12f)
+//                setUsePercentValues(true)
+//                setDrawEntryLabels(true)
+//                setDrawHoleEnabled(true)
+//                setHoleRadius(50f)
+//                setTransparentCircleRadius(55f)
+//                setRotationEnabled(true)
+//                setHighlightPerTapEnabled(true)
+//                animateY(1000)
+//                setNoDataText("No transactions yet")
+//            }
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
+//
+//
+//    private fun updatePieChart(spending: Map<String, Double>) {
+//        try {
+//            if (spending.isEmpty()) {
+//                binding.pieChart.setNoDataText("No transactions yet")
+//                binding.pieChart.invalidate()
+//                return
+//            }
+//
+//            val entries = spending.map { (category, amount) ->
+//                PieEntry(amount.toFloat(), category)
+//            }
+//
+//            val dataSet = PieDataSet(entries, "Categories").apply {
+//                colors = entries.map { entry ->
+//                    if (entry.label.startsWith("Income:")) {
+//                        ContextCompat.getColor(requireContext(), R.color.green_500)
+//                    } else {
+//                        ContextCompat.getColor(requireContext(), R.color.red_500)
+//                    }
+//                }
+//                valueFormatter = PercentFormatter(binding.pieChart)
+//                valueTextSize = 12f
+//                valueTextColor = ContextCompat.getColor(requireContext(), android.R.color.black)
+//            }
+//
+//            binding.pieChart.data = PieData(dataSet)
+//            binding.pieChart.invalidate()
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            binding.pieChart.setNoDataText("Error loading data")
+//            binding.pieChart.invalidate()
+//        }
+//    }
     // Save transactions to SharedPreferences
 //    private fun saveTransactions() {
 //        val sharedPreferences = getSharedPreferences("CashCraftPrefs", MODE_PRIVATE)

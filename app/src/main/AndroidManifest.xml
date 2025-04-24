@@ -31,6 +31,12 @@
         <activity android:name=".ui.main.EditTransactionActivity"
             android:exported="true"/>
 
+        <activity android:name=".ui.main.LoginActivity"
+            android:exported="true"/>
+
+        <activity android:name=".ui.main.RegisterActivity"
+            android:exported="true"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

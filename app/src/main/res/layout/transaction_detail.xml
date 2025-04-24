@@ -12,50 +12,88 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:text="Transaction Title" />
+        android:text="@string/tr_title" />
 
     <!-- Transaction Amount -->
     <TextView
         android:id="@+id/tvAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="₹0.00"
-        android:textSize="18sp"
-        android:textColor="#4CAF50" />
+        android:layout_marginBottom="20dp"
+        android:text="@string/am"
+        android:textColor="#4CAF50"
+        android:textSize="18sp" />
 
     <!-- Transaction Category -->
     <TextView
         android:id="@+id/tvCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Category: Food" />
+        android:text="@string/cat" />
 
     <!-- Transaction Date -->
     <TextView
         android:id="@+id/tvDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Date: 2023-04-13" />
+        android:text="@string/tr_date" />
 
     <!-- Transaction Notes -->
     <TextView
         android:id="@+id/tvNotes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Notes: Grocery shopping" />
+        android:text="@string/tr_note" />
 
-    <!-- Edit Button -->
-    <Button
-        android:id="@+id/btnEdit"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Edit Transaction" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="3"
+        android:padding="8dp">
 
-    <!-- Delete Button -->
-    <Button
-        android:id="@+id/btnDelete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Delete Transaction"
-        android:textColor="#F44336" />
+        <!-- Edit Button -->
+        <Button
+            android:id="@+id/btnEdit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/one_edit"
+            android:textAllCaps="false" />
+
+        <!-- Delete Button -->
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/one_delete"
+            android:textAllCaps="false"
+            android:textColor="#F44336" />
+
+        <!-- Cancel Button -->
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/one_cancel"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+    <!--    &lt;!&ndash; Edit Button &ndash;&gt;-->
+<!--    <Button-->
+<!--        android:id="@+id/btnEdit"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Edit Transaction" />-->
+
+<!--    &lt;!&ndash; Delete Button &ndash;&gt;-->
+<!--    <Button-->
+<!--        android:id="@+id/btnDelete"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Delete Transaction"-->
+<!--        android:textColor="#F44336" />-->
 </LinearLayout>

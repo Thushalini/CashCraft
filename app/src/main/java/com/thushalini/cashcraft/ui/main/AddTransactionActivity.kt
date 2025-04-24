@@ -25,7 +25,8 @@ class AddTransactionActivity : ComponentActivity() {
     private lateinit var btnSave: Button
     private var selectedDate: String = ""
     private var transactionType: String = ""
-//    private var transactionId: String? = null // For storing the ID of the transaction being edited
+//    private var transactionList = mutableListOf<Transaction>()
+    private var transactionId: String? = null // For storing the ID of the transaction being edited
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,7 @@ class AddTransactionActivity : ComponentActivity() {
         transactionType = intent.getStringExtra("transaction_type") ?: ""
 
         // Get transaction ID if in edit mode
-//        transactionId = intent.getStringExtra("transaction_id")
+        transactionId = intent.getStringExtra("transaction_id")
 
         etAmount = findViewById(R.id.etAmount)
         etDescription = findViewById(R.id.etDescription)
@@ -64,10 +65,10 @@ class AddTransactionActivity : ComponentActivity() {
             }, year, month, day).show()
         }
 
-        // If we're editing an existing transaction, load its details
-//        if (transactionId != null) {
-//            loadTransactionDetails(transactionId!!)
-//        }
+//         If we're editing an existing transaction, load its details
+        if (transactionId != null) {
+            loadTransactionDetails(transactionId!!)
+        }
 
         btnSave.setOnClickListener {
             val amountText = etAmount.text.toString().trim()
@@ -87,8 +88,9 @@ class AddTransactionActivity : ComponentActivity() {
             val description = etDescription.text.toString().trim()
             val category = spinnerCategory.selectedItem.toString()
 
+            val id = transactionId?.toLongOrNull() ?: System.currentTimeMillis()
             val transaction = Transaction(
-                id = System.currentTimeMillis(),
+                id = id,
                 title = transactionType,
                 amount = amount,
                 category = category,
@@ -111,30 +113,30 @@ class AddTransactionActivity : ComponentActivity() {
         }
     }
 
-//    private fun loadTransactionDetails(transactionId: String) {
-//        val sharedPref = getSharedPreferences("transactions", Context.MODE_PRIVATE)
-//        val transactionList = sharedPref.getString("transaction_list", "[]")
-//        val jsonArray = JSONArray(transactionList)
-//
-//        for (i in 0 until jsonArray.length()) {
-//            val transactionJson = jsonArray.getJSONObject(i)
-//            if (transactionJson.getString("id") == transactionId) {
-//                etAmount.setText(transactionJson.getString("amount"))
-//                etDescription.setText(transactionJson.getString("notes"))
-//                val category = transactionJson.getString("category")
-//                val categories = listOf("Food", "Transport", "Entertainment", "Salary", "Other")
-//                val position = categories.indexOf(category)
-//                spinnerCategory.setSelection(position)
-//                selectedDate = transactionJson.getString("date")
-//                tvDate.text = selectedDate
-//                break
-//            }
-//        }
-//    }
+    private fun loadTransactionDetails(transactionId: String) {
+        val sharedPref = getSharedPreferences("transactionList", Context.MODE_PRIVATE)
+        val transactionList = sharedPref.getString("transactionList", "[]")
+        val jsonArray = JSONArray(transactionList)
+
+        for (i in 0 until jsonArray.length()) {
+            val transactionJson = jsonArray.getJSONObject(i)
+            if (transactionJson.getString("id") == transactionId) {
+                etAmount.setText(transactionJson.getString("amount"))
+                etDescription.setText(transactionJson.getString("notes"))
+                val category = transactionJson.getString("category")
+                val categories = listOf("Food", "Transport", "Entertainment", "Salary", "Other")
+                val position = categories.indexOf(category)
+                spinnerCategory.setSelection(position)
+                selectedDate = transactionJson.getString("date")
+                tvDate.text = selectedDate
+                break
+            }
+        }
+    }
 
     private fun saveTransaction(context: Context, newTransaction: Transaction) {
         val sharedPref = context.getSharedPreferences("transactionList", Context.MODE_PRIVATE)
-        val existing = sharedPref.getString("transaction_list", "[]")
+        val existing = sharedPref.getString("transactionList", "[]")
         val jsonArray = JSONArray(existing)
 
         val jsonObj = JSONObject().apply {
@@ -147,21 +149,27 @@ class AddTransactionActivity : ComponentActivity() {
             put("notes", newTransaction.notes)
         }
 
-//        if (transactionId != null) {
-//            // Edit existing transaction
-//            for (i in 0 until jsonArray.length()) {
-//                if (jsonArray.getJSONObject(i).getString("id") == transactionId) {
-//                    jsonArray.put(i, jsonObj) // Update the transaction
-//                    break
-//                }
-//            }
-//        } else {
-//            // Add new transaction
-//            jsonArray.put(jsonObj)
-//        }
+        for (i in 0 until jsonArray.length()) {
+            if (jsonArray.getJSONObject(i).getString("id") == transactionId) {
+                jsonArray.put(i, jsonObj) // Update the transaction
+                break
+            }
+        }
 
-        jsonArray.put(jsonObj)
-        sharedPref.edit().putString("transaction_list", jsonArray.toString()).apply()
+        var isUpdated = false
+        for (i in 0 until jsonArray.length()) {
+            val obj = jsonArray.getJSONObject(i)
+            if (obj.getString("id") == transactionId) {
+                jsonArray.put(i, jsonObj) // Update existing
+                isUpdated = true
+                break
+            }
+        }
+        if (!isUpdated) {
+            jsonArray.put(jsonObj) // Only add new if not editing
+        }
+
+        sharedPref.edit().putString("transactionList", jsonArray.toString()).apply()
     }
 
     private fun sendTransactionNotification(type: String, amount: Double) {
@@ -170,20 +178,22 @@ class AddTransactionActivity : ComponentActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                channelId, "Transaction Notifications",
+                channelId,
+                "Transaction Notifications",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             manager.createNotificationChannel(channel)
         }
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("Transaction Saved")
-            .setContentText("$type of ₹%.2f added.".format(amount))
-            .setAutoCancel(true)
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // Replace with your icon
+            .setContentTitle("New $type")
+            .setContentText("₹$amount has been added.")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
-        manager.notify(System.currentTimeMillis().toInt(), notification)
+        manager.notify(Random().nextInt(), notification)
     }
+
 }
 

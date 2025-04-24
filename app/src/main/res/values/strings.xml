@@ -31,4 +31,41 @@
     <string name="delete">Delete</string>
 
     <!--single Transaction-->
+
+    <!--login screen-->
+    <string name="login_text1">Welcome Back!</string>
+    <string name="login_text2">Log in to manage your tasks and \nkeep your goals within reach.</string>
+    <string name="login_user">Username</string>
+    <string name="login_pw">Password</string>
+    <string name="login_btn">LOGIN</string>
+    <string name="login_text3">- OR -</string>
+    <string name="login_btn_google">LOGIN WITH GOOGLE</string>
+    <string name="login_btn_FB">LOGIN WITH FACEBOOK</string>
+    <string name="login_text4">No account yet?  Register</string>
+
+    <!--Register Screen-->
+    <string name="register_text1">Create Account</string>
+    <string name="register_name">fullname</string>
+    <string name="register_un">username</string>
+    <string name="register_mail">E-mail</string>
+    <string name="register_pw">password</string>
+    <string name="register_re_pw">re-enter password</string>
+    <string name="register_text2">Agree with <b>Terms &amp; Conditions</b></string>
+    <string name="register_text3">Already have an account?</string>
+    <string name="register_text4">Login</string>
+
+    <string name="no_transactions">transactions</string>
+    <string name="add_transaction">Add Transaction</string>
+<!--    main-->
+    <string name="total_exp">Total Expense</string>
+    <string name="total_inc">Total Income</string>
+    <string name="cat_spend">Expense</string>
+    <string name="tr_title">Transaction Title</string>
+    <string name="am">₹0.00</string>
+    <string name="cat">Category: Food</string>
+    <string name="tr_date">Date: 2023-04-13</string>
+    <string name="tr_note">Notes: Grocery shopping</string>
+    <string name="one_edit">Edit</string>
+    <string name="one_delete">Delete</string>
+    <string name="one_cancel">Cancel</string>
 </resources>

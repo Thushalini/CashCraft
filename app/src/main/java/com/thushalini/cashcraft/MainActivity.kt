@@ -1,38 +1,27 @@
 package com.thushalini.cashcraft
 
 import android.annotation.SuppressLint
-//import android.app.AlertDialog
-//import android.content.Context
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-//import androidx.core.content.ContextCompat
-//import androidx.recyclerview.widget.LinearLayoutManager
-//import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.thushalini.cashcraft.ui.main.AddTransactionActivity
-//import com.thushalini.cashcraft.ui.main.Transaction
+import com.thushalini.cashcraft.ui.main.Transaction
 import com.thushalini.cashcraft.ui.main.TransactionListActivity
-//import com.github.mikephil.charting.charts.PieChart
-//import com.github.mikephil.charting.data.PieData
-//import com.github.mikephil.charting.data.PieDataSet
-//import com.github.mikephil.charting.data.PieEntry
-//import com.google.gson.reflect.TypeToken
-//import com.google.gson.Gson
-//import com.thushalini.cashcraft.ui.main.EditTransactionActivity
-//import com.thushalini.cashcraft.ui.main.TransactionAdapter
-
 
 class MainActivity : ComponentActivity() {
 
-//    private var _binding: FragmentDashboardBinding? = null
     private lateinit var tvBalance: TextView
+    private lateinit var tvTotalIncome: TextView
+    private lateinit var tvTotalExpense: TextView
     private lateinit var btnAddExpense: Button
     private lateinit var btnAddIncome: Button
     private lateinit var btnViewTransactions: Button
@@ -41,90 +30,113 @@ class MainActivity : ComponentActivity() {
     private var monthlyBudget: Double = 0.0
 
     private lateinit var addTransactionLauncher: ActivityResultLauncher<Intent>
-//    private lateinit var transactionList: MutableList<Transaction>
+    private lateinit var transactionList: MutableList<Transaction>
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
+        // Initialize views
         tvBalance = findViewById(R.id.tvBalance)
+        tvTotalIncome = findViewById(R.id.tvTotalIncome)
+        tvTotalExpense = findViewById(R.id.tvTotalExpense)
         btnAddExpense = findViewById(R.id.btnAddExpense)
         btnAddIncome = findViewById(R.id.btnAddIncome)
         btnViewTransactions = findViewById(R.id.btnViewTransactions)
-//        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewTransactions)
 
+        // Initialize the transaction list
+        transactionList = mutableListOf()
 
-//        loadTransactions()
-//
-//        // Declare the adapter first
-//        val adapter = TransactionAdapter(this@MainActivity, transactionList, object : TransactionAdapter.OnTransactionActionListener {
-//            override fun onEdit(transaction: Transaction) {
-//                val intent = Intent(this@MainActivity, EditTransactionActivity::class.java)
-//                intent.putExtra("transaction_id", transaction.id)
-//                startActivity(intent)
-//            }
-//
-//            override fun onDelete(transaction: Transaction) {
-//                AlertDialog.Builder(this@MainActivity)
-//                    .setMessage("Are you sure you want to delete this transaction?")
-//                    .setPositiveButton("Yes") { _, _ ->
-//                        // Remove the transaction and notify the adapter
-//                        transactionList.remove(transaction)
-////                        adapter.notifyDataSetChanged() // Now this works since adapter is in scope
-//                    }
-//                    .setNegativeButton("No", null)
-//                    .show()
-//            }
-//    })
-//
-//        recyclerView.layoutManager = LinearLayoutManager(this)
-//        recyclerView.adapter = adapter
+        // Load saved balance and transactions
+        loadTransactions()
 
-        // Load saved balance and monthly budget
-        val sharedPreferences = getSharedPreferences("CashCraftPrefs", MODE_PRIVATE)
-        balance = sharedPreferences.getFloat("balance", 0.0f).toDouble()
+        // Update balance and transaction summary
+        updateSummary()
+
+        // Load saved balance and monthly budget from SharedPreferences
+        val sharedPreferences = getSharedPreferences("transactionList", MODE_PRIVATE)
+//        balance = sharedPreferences.getFloat("balance", 0.0f).toDouble()
         monthlyBudget = sharedPreferences.getFloat("monthly_budget", 0.0f).toDouble()
 
         updateBalanceText()
 
         // Register ActivityResultLauncher
-        addTransactionLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result: ActivityResult ->
+        addTransactionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK && result.data != null) {
                 val data = result.data!!
                 val amount = data.getDoubleExtra("amount", 0.0)
                 val type = data.getStringExtra("title")
 
-                balance = if (type == "Income") balance + amount else balance - amount
-                updateBalanceText()
+//                balance = if (type == "Income") balance + amount else balance - amount
+//                updateBalanceText()
 
                 // Save new balance to SharedPreferences
-//                val sharedPreferences = getSharedPreferences("CashCraftPrefs", MODE_PRIVATE)
-                sharedPreferences.edit().putFloat("balance", balance.toFloat()).apply()
-//
-//                // Add new transaction and save
-//                val transaction = Transaction(title = type, amount = amount, category = "", date = "", notes = "")
-//                transactionList.add(transaction)
-//                saveTransactions()
+//                sharedPreferences.edit().putFloat("balance", balance.toFloat()).apply()
+
+                // Create and add new transaction
+                val transaction = Transaction(
+                    id = System.currentTimeMillis(),
+                    title = type ?: "Unknown",
+                    amount = amount,
+                    category = data.getStringExtra("category") ?: "",
+                    date = data.getStringExtra("date") ?: "",
+                    notes = data.getStringExtra("notes") ?: ""
+                )
+
+                transactionList.add(transaction)
+                saveTransactions() // Save updated transactions list
             }
         }
 
-        btnAddExpense.setOnClickListener {
-            openAddTransactionActivity("Expense")
-        }
-
-        btnAddIncome.setOnClickListener {
-            openAddTransactionActivity("Income")
-        }
-
+        // Button click listeners
+        btnAddExpense.setOnClickListener { openAddTransactionActivity("Expense") }
+        btnAddIncome.setOnClickListener { openAddTransactionActivity("Income") }
         btnViewTransactions.setOnClickListener {
-            Toast.makeText(this, "Opening Transactions", Toast.LENGTH_SHORT).show()
-            Log.d("MainActivity", "Attempting to open TransactionListActivity")
             val intent = Intent(this, TransactionListActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun loadTransactions() {
+        val sharedPref = getSharedPreferences("transactionList", Context.MODE_PRIVATE)
+        val jsonString = sharedPref.getString("transaction_list", null)
+
+        if (!jsonString.isNullOrEmpty()) {
+            try {
+                val gson = Gson()
+                val transactionListType = object : TypeToken<List<Transaction>>() {}.type
+                transactionList = gson.fromJson(jsonString, transactionListType)
+                Log.d("TransactionList", "Transactions loaded in main: ${transactionList.size}")
+            } catch (e: Exception) {
+                Log.e("TransactionList", "Error loading transactions: ${e.message}")
+            }
+        } else {
+            Log.d("TransactionList", "No transactions found in shared preferences.")
+        }
+    }
+
+    private fun updateSummary() {
+        var totalIncome = 0.0
+        var totalExpense = 0.0
+
+        for (transaction in transactionList) {
+            if (transaction.title == "Income") {
+                totalIncome += transaction.amount
+            } else {
+                totalExpense += transaction.amount
+            }
+        }
+
+        balance = totalIncome - totalExpense
+        if (balance < 0 ) {
+            tvBalance.setTextColor(getColor(R.color.red))
+        }
+        updateBalanceText()
+
+        tvTotalIncome.text = "₹%.2f".format(totalIncome)
+        tvTotalExpense.text = "₹%.2f".format(totalExpense)
+        tvBalance.text = "₹%.2f".format(balance)
     }
 
     @SuppressLint("SetTextI18n")
@@ -138,84 +150,13 @@ class MainActivity : ComponentActivity() {
         addTransactionLauncher.launch(intent)
     }
 
-    // Load transactions from SharedPreferences
-//    private fun loadTransactions() {
-//        val sharedPreferences = getSharedPreferences("CashCraftPrefs", MODE_PRIVATE)
-//        val transactionsJson = sharedPreferences.getString("transactions", null)
-//        if (!transactionsJson.isNullOrEmpty()) {
-//            val gson = Gson()
-//            val type = object : TypeToken<MutableList<Transaction>>() {}.type
-//            transactionList = gson.fromJson(transactionsJson, type)
-//        } else {
-//            transactionList = mutableListOf()
-//        }
-//    }
-
-//    private fun setupPieChart() {
-//        try {
-//            binding.pieChart.apply {
-//                description.isEnabled = false
-//                legend.isEnabled = true
-//                setHoleColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
-//                setTransparentCircleColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
-//                setEntryLabelColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-//                setEntryLabelTextSize(12f)
-//                setUsePercentValues(true)
-//                setDrawEntryLabels(true)
-//                setDrawHoleEnabled(true)
-//                setHoleRadius(50f)
-//                setTransparentCircleRadius(55f)
-//                setRotationEnabled(true)
-//                setHighlightPerTapEnabled(true)
-//                animateY(1000)
-//                setNoDataText("No transactions yet")
-//            }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//    }
-//
-//
-//    private fun updatePieChart(spending: Map<String, Double>) {
-//        try {
-//            if (spending.isEmpty()) {
-//                binding.pieChart.setNoDataText("No transactions yet")
-//                binding.pieChart.invalidate()
-//                return
-//            }
-//
-//            val entries = spending.map { (category, amount) ->
-//                PieEntry(amount.toFloat(), category)
-//            }
-//
-//            val dataSet = PieDataSet(entries, "Categories").apply {
-//                colors = entries.map { entry ->
-//                    if (entry.label.startsWith("Income:")) {
-//                        ContextCompat.getColor(requireContext(), R.color.green_500)
-//                    } else {
-//                        ContextCompat.getColor(requireContext(), R.color.red_500)
-//                    }
-//                }
-//                valueFormatter = PercentFormatter(binding.pieChart)
-//                valueTextSize = 12f
-//                valueTextColor = ContextCompat.getColor(requireContext(), android.R.color.black)
-//            }
-//
-//            binding.pieChart.data = PieData(dataSet)
-//            binding.pieChart.invalidate()
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            binding.pieChart.setNoDataText("Error loading data")
-//            binding.pieChart.invalidate()
-//        }
-//    }
     // Save transactions to SharedPreferences
-//    private fun saveTransactions() {
-//        val sharedPreferences = getSharedPreferences("CashCraftPrefs", MODE_PRIVATE)
-//        val editor = sharedPreferences.edit()
-//        val gson = Gson()
-//        val transactionsJson = gson.toJson(transactionList)
-//        editor.putString("transactions", transactionsJson)
-//        editor.apply()
-//    }
+    private fun saveTransactions() {
+        val sharedPreferences = getSharedPreferences("transactionList", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val transactionsJson = gson.toJson(transactionList)
+        editor.putString("transaction_list", transactionsJson)
+        editor.apply()
+    }
 }

@@ -14,12 +14,13 @@ import com.thushalini.cashcraft.R
 class TransactionAdapter(
     private val context: Context,
     private var transactionList: List<Transaction>,
-    private val listener: OnTransactionActionListener
+    private val listener: OnTransactionActionListener,
 ) : RecyclerView.Adapter<TransactionViewHolder>() {
 
     interface OnTransactionActionListener {
         fun onEdit(transaction: Transaction)
         fun onDelete(transaction: Transaction)
+        fun onViewDetails(transaction: Transaction)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -34,6 +35,10 @@ class TransactionAdapter(
         val transaction = transactionList[position]
 
         holder.itemView.setBackgroundColor(Color.LTGRAY)
+        holder.itemView.setOnClickListener {
+            listener.onViewDetails(transactionList[position])
+        }
+
         Log.d("TransactionAdapter", "Binding transaction at position $position: $transaction")
 
         holder.tvTitle.text = transaction.title

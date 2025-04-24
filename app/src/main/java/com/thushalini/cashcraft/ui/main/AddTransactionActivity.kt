@@ -1,20 +1,20 @@
 package com.thushalini.cashcraft.ui.main
 
 import android.app.DatePickerDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.core.app.NotificationCompat
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import com.thushalini.cashcraft.R
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+import android.content.Intent
 
 class AddTransactionActivity : ComponentActivity() {
 
@@ -25,17 +25,12 @@ class AddTransactionActivity : ComponentActivity() {
     private lateinit var btnSave: Button
     private var selectedDate: String = ""
     private var transactionType: String = ""
-//    private var transactionList = mutableListOf<Transaction>()
-    private var transactionId: String? = null // For storing the ID of the transaction being edited
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_transaction)
 
         transactionType = intent.getStringExtra("transaction_type") ?: ""
-
-        // Get transaction ID if in edit mode
-        transactionId = intent.getStringExtra("transaction_id")
 
         etAmount = findViewById(R.id.etAmount)
         etDescription = findViewById(R.id.etDescription)
@@ -65,11 +60,6 @@ class AddTransactionActivity : ComponentActivity() {
             }, year, month, day).show()
         }
 
-//         If we're editing an existing transaction, load its details
-        if (transactionId != null) {
-            loadTransactionDetails(transactionId!!)
-        }
-
         btnSave.setOnClickListener {
             val amountText = etAmount.text.toString().trim()
             if (amountText.isEmpty()) {
@@ -88,17 +78,17 @@ class AddTransactionActivity : ComponentActivity() {
             val description = etDescription.text.toString().trim()
             val category = spinnerCategory.selectedItem.toString()
 
-            val id = transactionId?.toLongOrNull() ?: System.currentTimeMillis()
+            val id = System.currentTimeMillis()
             val transaction = Transaction(
                 id = id,
                 title = transactionType,
                 amount = amount,
                 category = category,
                 date = selectedDate,
-                notes = description,
+                notes = description
             )
 
-            // Save or update the transaction
+            // Save the transaction
             saveTransaction(this, transaction)
 
             Toast.makeText(this, "Transaction saved successfully", Toast.LENGTH_SHORT).show()
@@ -113,35 +103,13 @@ class AddTransactionActivity : ComponentActivity() {
         }
     }
 
-    private fun loadTransactionDetails(transactionId: String) {
-        val sharedPref = getSharedPreferences("transactionList", Context.MODE_PRIVATE)
-        val transactionList = sharedPref.getString("transactionList", "[]")
-        val jsonArray = JSONArray(transactionList)
-
-        for (i in 0 until jsonArray.length()) {
-            val transactionJson = jsonArray.getJSONObject(i)
-            if (transactionJson.getString("id") == transactionId) {
-                etAmount.setText(transactionJson.getString("amount"))
-                etDescription.setText(transactionJson.getString("notes"))
-                val category = transactionJson.getString("category")
-                val categories = listOf("Food", "Transport", "Entertainment", "Salary", "Other")
-                val position = categories.indexOf(category)
-                spinnerCategory.setSelection(position)
-                selectedDate = transactionJson.getString("date")
-                tvDate.text = selectedDate
-                break
-            }
-        }
-    }
-
     private fun saveTransaction(context: Context, newTransaction: Transaction) {
         val sharedPref = context.getSharedPreferences("transactionList", Context.MODE_PRIVATE)
-        val existing = sharedPref.getString("transactionList", "[]")
+        val existing = sharedPref.getString("transaction_list", "[]")
         val jsonArray = JSONArray(existing)
 
         val jsonObj = JSONObject().apply {
             put("id", newTransaction.id.toString())
-//            put("id", transactionId ?: System.currentTimeMillis().toString()) // Use transactionId if editing, or generate a new ID
             put("title", newTransaction.title)
             put("amount", newTransaction.amount)
             put("category", newTransaction.category)
@@ -149,27 +117,11 @@ class AddTransactionActivity : ComponentActivity() {
             put("notes", newTransaction.notes)
         }
 
-        for (i in 0 until jsonArray.length()) {
-            if (jsonArray.getJSONObject(i).getString("id") == transactionId) {
-                jsonArray.put(i, jsonObj) // Update the transaction
-                break
-            }
-        }
+        // Add the new transaction to the list
+        jsonArray.put(jsonObj)
 
-        var isUpdated = false
-        for (i in 0 until jsonArray.length()) {
-            val obj = jsonArray.getJSONObject(i)
-            if (obj.getString("id") == transactionId) {
-                jsonArray.put(i, jsonObj) // Update existing
-                isUpdated = true
-                break
-            }
-        }
-        if (!isUpdated) {
-            jsonArray.put(jsonObj) // Only add new if not editing
-        }
-
-        sharedPref.edit().putString("transactionList", jsonArray.toString()).apply()
+        // Save the updated list to SharedPreferences
+        sharedPref.edit().putString("transaction_list", jsonArray.toString()).apply()
     }
 
     private fun sendTransactionNotification(type: String, amount: Double) {
@@ -194,6 +146,4 @@ class AddTransactionActivity : ComponentActivity() {
 
         manager.notify(Random().nextInt(), notification)
     }
-
 }
-

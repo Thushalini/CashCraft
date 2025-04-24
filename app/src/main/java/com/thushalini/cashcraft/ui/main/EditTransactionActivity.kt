@@ -43,11 +43,7 @@ class EditTransactionActivity : ComponentActivity() {
 
         if (transaction != null) {
             etAmount.setText(transaction.amount.toString())
-        }
-        if (transaction != null) {
             etDescription.setText(transaction.notes)
-        }
-        if (transaction != null) {
             spinnerCategory.setSelection(categories.indexOf(transaction.category))
         }
 
@@ -59,11 +55,7 @@ class EditTransactionActivity : ComponentActivity() {
             if (updatedAmount != null) {
                 if (transaction != null) {
                     transaction.amount = updatedAmount
-                }
-                if (transaction != null) {
                     transaction.notes = updatedDescription
-                }
-                if (transaction != null) {
                     transaction.category = updatedCategory
                 }
 

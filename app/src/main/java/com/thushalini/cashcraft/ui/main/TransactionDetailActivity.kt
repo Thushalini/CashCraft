@@ -36,6 +36,11 @@ class TransactionDetailActivity : ComponentActivity() {
                         transaction = updatedTransaction
                         displayTransactionDetails()
                         updateTransactionInPrefs(updatedTransaction)
+
+                        // Return result to parent activity
+                        val resultIntent = Intent()
+                        resultIntent.putExtra("isUpdated", true)
+                        setResult(RESULT_OK, resultIntent)
                     }
                 }
             }
@@ -70,21 +75,25 @@ class TransactionDetailActivity : ComponentActivity() {
 
         // Set click listener for Edit button
         btnEdit.setOnClickListener {
-//            val intent = Intent(this, EditTransactionActivity::class.java)
-//            intent.putExtra("transaction", transaction)
-//            editTransactionLauncher.launch(intent)
-
-            val intent = Intent(this, AddTransactionActivity::class.java)
-            intent.putExtra("transaction", transaction) // Pass current transaction to be edited
-            intent.putExtra("isEditMode", true) // A flag to let AddTransactionActivity know it's editing
+            val intent = Intent(this, EditTransactionActivity::class.java)
+            intent.putExtra("transaction", transaction)
             editTransactionLauncher.launch(intent)
+
+//            val intent = Intent(this, AddTransactionActivity::class.java)
+//            intent.putExtra("transaction", transaction) // Pass current transaction to be edited
+//            intent.putExtra("isEditMode", true) // A flag to let AddTransactionActivity know it's editing
+//            editTransactionLauncher.launch(intent)
 
         }
 
         // Set click listener for Delete button
         btnDelete.setOnClickListener {
             deleteTransaction(transaction)
-            Toast.makeText(this, "Transaction deleted", Toast.LENGTH_SHORT).show()
+
+            val resultIntent = Intent()
+            resultIntent.putExtra("isDeleted", true)
+            setResult(RESULT_OK, resultIntent)
+            Toast.makeText(this, "Transaction details are deleted", Toast.LENGTH_SHORT).show()
             finish()
         }
 

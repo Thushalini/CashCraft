@@ -1,6 +1,5 @@
 package com.thushalini.cashcraft.ui.main
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +8,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -17,18 +17,15 @@ import org.json.JSONArray
 
 class TransactionListActivity : ComponentActivity() {
 
-//    private lateinit var recyclerView: RecyclerView
     private lateinit var spinner: Spinner
     private lateinit var adapter: TransactionAdapter
     private var transactionList = mutableListOf<Transaction>()
-    private val categories = listOf("All", "Food", "Salary", "Transport", "Other") // Add more as needed
+    private val categories = listOf("All", "Food", "Salary", "Transport" , "Entertainment", "Other") // Add more as needed
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.list_transaction)
 
-
-//        recyclerView = findViewById(R.id.recyclerViewTransactions)
         spinner = findViewById(R.id.spinnerCategory)
 
         transactionList = loadTransactions()
@@ -41,23 +38,17 @@ class TransactionListActivity : ComponentActivity() {
                 // Handle edit transaction
             }
 
-            @SuppressLint("NotifyDataSetChanged")
             override fun onDelete(transaction: Transaction) {
-                // Remove transaction
                 transactionList.remove(transaction)
+                saveTransactions(transactionList)
+                adapter.updateData(transactionList)
+                Toast.makeText(this@TransactionListActivity, "Transaction deleted", Toast.LENGTH_SHORT).show()
+            }
 
-                // Save updated list to SharedPreferences (convert to JSON)
-                val sharedPref = getSharedPreferences("transactionList", Context.MODE_PRIVATE)
-                val editor = sharedPref.edit()
-                val gson = Gson()
-                val json = gson.toJson(transactionList)
-                editor.putString("transactionList", json)
-                editor.apply()
-
-                // Update RecyclerView
-                adapter.notifyDataSetChanged()
-
-                Toast.makeText(this@TransactionListActivity, "Transaction is deleted", Toast.LENGTH_SHORT).show()
+            override fun onViewDetails(transaction: Transaction) {
+                val intent = Intent(this@TransactionListActivity, TransactionDetailActivity::class.java)
+                intent.putExtra("transaction", transaction)
+                startActivity(intent)
             }
 
         })
@@ -102,8 +93,9 @@ class TransactionListActivity : ComponentActivity() {
                     val position = rv.getChildAdapterPosition(it)
                     val selectedTransaction = transactionList[position]
                     val intent = Intent(this@TransactionListActivity, TransactionDetailActivity::class.java)
-                    intent.putExtra("transactionList", selectedTransaction)
-                    startActivity(intent)
+                    intent.putExtra("transaction", selectedTransaction)
+//                    startActivity(intent)
+                    detailLauncher.launch(intent)
                 }
                 return false
             }
@@ -112,7 +104,7 @@ class TransactionListActivity : ComponentActivity() {
 
     private fun loadTransactions(): MutableList<Transaction> {
         val sharedPref = getSharedPreferences("transactionList", Context.MODE_PRIVATE)
-        val jsonString = sharedPref.getString("transactionList", null)
+        val jsonString = sharedPref.getString("transaction_list", null)
 
         if (!jsonString.isNullOrEmpty()) {
             val jsonArray = JSONArray(jsonString)
@@ -142,4 +134,27 @@ class TransactionListActivity : ComponentActivity() {
         }
         return transactionList
     }
+
+    private fun saveTransactions(transactions: List<Transaction>) {
+        val sharedPref = getSharedPreferences("transaction_list", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        val gson = Gson()
+        val json = gson.toJson(transactions)
+        editor.putString("transaction_list", json)
+        editor.apply()
+    }
+
+    private val detailLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            if (data?.getBooleanExtra("isUpdated", false) == true || data?.getBooleanExtra("isDeleted", false) == true) {
+                // Refresh the transaction list here
+                // Refresh the transaction list and update UI
+                transactionList = loadTransactions()
+                adapter.updateData(transactionList)
+            }
+        }
+    }
+
+
 }
